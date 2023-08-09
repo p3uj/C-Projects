@@ -12,32 +12,11 @@ struct list *head, *curr, *tail;
 int createdList, choice, insert;
 char another = 'Y';
 
-//---------- CHECKING FUNCTION ----------//
-void check(){
-    printf("\t\tDONE A LIST\n");
-    printf("\nEnter any key to go back to main...");
-    getch();
-    system("cls");
-}
-//----- END OF THE CHECKING FUNCTION ----//
-
-
-
-//---------- DELETION FUNCTION ----------//
-void delete(){
-    printf("\t\tDELETE A LIST\n");
-    printf("\nEnter any key to go back to main...");
-    getch();
-    system("cls");
-}
-//----- END OF THE DELETION FUNCTION ----//
-
-
 //---------- VIEWING FUNCTION ----------//
 void view(){
     if (choice == 1)
         printf("\t\tVIEW A LIST\n");
-    else
+    if (choice == 2)
         printf("\nUPDATED: ");
     printf("TO-DO LIST\n");
     curr = head;
@@ -47,17 +26,95 @@ void view(){
         printf("%d. [ ] %s\n", createdList, curr->task);
         curr = curr->next;
     }
+    if (choice == 1){
+        printf("\nEnter any key to go back to main...");
+        getch();
+        system("cls");
+    }
+}
+//------ END OF THE VIEW FUNCTION ------//
+
+//---------- CHECKING FUNCTION ----------//
+void check(){
+    printf("\t\t4. CHECKING THE LIST AS DONE\n");
+
     printf("\nEnter any key to go back to main...");
     getch();
     system("cls");
 }
-//------ END OF THE VIEW FUNCTION ------//
+//----- END OF THE CHECKING FUNCTION ----//
+
+//---------- DELETION FUNCTION ----------//
+void delete(){
+    int delete, found;
+    struct list *compare1;
+
+    another = 'Y';
+    while (another == 'Y' || another == 'y'){
+        system("cls");
+        printf("\t\t3. DELETE LIST\n\n");
+        view();
+        found = 0;
+        printf("Enter a number to be deleted: ");
+        scanf("%d", &delete);
+
+        // To find the number to be deleted and unlinked it
+        curr = head;
+        createdList = 0;
+        while (curr->task != NULL && found == 0){
+            createdList++;
+            // if the number to be deleted is in the head node
+            if ((createdList == delete) && (curr == head)){
+                head = head->next;
+                curr->next = NULL;
+                found = 1;
+            }
+            // if the number to be deleted is in the tail node
+            else if ((createdList == delete) && (curr == tail)){
+                tail = compare1;
+                tail->next = NULL;
+                found = 1;
+            }
+            else if (createdList == delete){
+                compare1->next = curr->next;
+                curr->next = NULL;
+                found = 1;
+            }
+            else {
+                compare1 = curr;
+                curr = curr->next;
+            }
+        }
+
+        // Display if successful of not in the list
+        if (found){ // the conditon of if (found) can be replace to if (found == 1)
+            free(curr);
+            printf("\n%d is successfully deleleted\n\nUPDATED: ", delete);
+            view();
+        }
+        else
+            printf("\n%d is not in the list\n", delete);
+
+        printf("\nDo you want to add another list? (Y/N): ");
+        scanf(" %c", &another);
+
+        // Validation of the input 
+        while ((another != 'Y' && another != 'y') && (another != 'N' && another != 'n')){
+            printf("WARNING: INVALID CHOICE!\n\n");
+            printf("Do you want to add another list? (Y/N): ");
+            scanf(" %c", &another);
+        }
+    }
+    system("cls");
+}
+//----- END OF THE DELETION FUNCTION ----//
 
 //---------- ADD FUNCTION ----------//
 void add(){
-    printf("\t\tADD A LIST\n");
+    printf("\t\t2. ADD LIST\n");
     another = 'Y';
     while (another == 'Y' || another == 'y'){
+        view();
         createdList++;
         curr = (struct list *)malloc(sizeof(struct list));
 
@@ -81,15 +138,14 @@ void add(){
             scanf(" %c", &another);
         }
     }
-
-    view();
+    system("cls");
 }
 //----- END OF THE ADD FUNCTION ----//
 
 //---------- CREATING FUNCTION ----------//
 void createList(){
     system("cls");
-    printf("\t\tCREATE A LIST\n");
+    printf("\t\t1. Create a list\n");
 
     head=curr=tail=NULL;
 
