@@ -2,31 +2,38 @@
 #include<malloc.h>  // header for memory location.
 #include<stdlib.h>  // header for clear screen.
 #include<conio.h>   // header for getch() function.
+#include<string.h>  // header for strlen function.
 
 struct list{
-    char task[100];
+    char task[101];     // Maximum of 100 characters only.
     struct list *next;
 };
 struct list *head, *curr, *tail;
 
-int createdList, choice, insert;
+int created = 0, numList, choice, found, num;
 char another = 'Y';
 
 //---------- VIEWING FUNCTION ----------//
 void view(){
-    if (choice == 1)
-        printf("\t\tVIEW A LIST\n");
-    if (choice == 2)
-        printf("\nUPDATED: ");
-    printf("TO-DO LIST\n");
-    curr = head;
-    createdList = 0;
-    while (curr != NULL){
-        createdList++;
-        printf("%d. [ ] %s\n", createdList, curr->task);
-        curr = curr->next;
+    if (choice == 2){
+        printf("-----------------------------------------------------------------\n");
+        printf("\t\t\t2. VIEW A LIST\n");
+        printf("-----------------------------------------------------------------\n");
     }
-    if (choice == 1){
+
+    printf("TO-DO LIST\n");
+    if (head != NULL){
+        curr = head;
+        numList = 0;
+        while (curr != NULL){
+            numList++;
+            printf("%d. %s\n", numList, curr->task);
+            curr = curr->next;
+        }
+    }
+    else
+        printf("No list created!\n");
+    if (choice == 2){
         printf("\nEnter any key to go back to main...");
         getch();
         system("cls");
@@ -34,48 +41,40 @@ void view(){
 }
 //------ END OF THE VIEW FUNCTION ------//
 
-//---------- CHECKING FUNCTION ----------//
-void check(){
-    printf("\t\t4. CHECKING THE LIST AS DONE\n");
-
-    printf("\nEnter any key to go back to main...");
-    getch();
-    system("cls");
-}
-//----- END OF THE CHECKING FUNCTION ----//
-
 //---------- DELETION FUNCTION ----------//
 void delete(){
-    int delete, found;
     struct list *compare1;
-
     another = 'Y';
+
     while (another == 'Y' || another == 'y'){
         system("cls");
-        printf("\t\t3. DELETE LIST\n\n");
+        printf("-----------------------------------------------------------------\n");
+        printf("\t\t\t4. DELETE LIST\n");
+        printf("-----------------------------------------------------------------\n");
         view();
         found = 0;
         printf("Enter a number to be deleted: ");
-        scanf("%d", &delete);
+        scanf("%d", &num);
 
         // To find the number to be deleted and unlinked it
         curr = head;
-        createdList = 0;
+        numList = 0;
         while (curr->task != NULL && found == 0){
-            createdList++;
-            // if the number to be deleted is in the head node
-            if ((createdList == delete) && (curr == head)){
+            numList++;
+            // if the number to be deleted is in the head node.
+            if ((numList == num) && (curr == head)){
                 head = head->next;
                 curr->next = NULL;
                 found = 1;
             }
-            // if the number to be deleted is in the tail node
-            else if ((createdList == delete) && (curr == tail)){
+            // if the number to be deleted is in the tail node.
+            else if ((numList == num) && (curr == tail)){
                 tail = compare1;
                 tail->next = NULL;
                 found = 1;
             }
-            else if (createdList == delete){
+            // if the number to be deleted is not in the head and tail node.
+            else if (numList == num){
                 compare1->next = curr->next;
                 curr->next = NULL;
                 found = 1;
@@ -89,11 +88,14 @@ void delete(){
         // Display if successful of not in the list
         if (found){ // the conditon of if (found) can be replace to if (found == 1)
             free(curr);
-            printf("\n%d is successfully deleleted\n\nUPDATED: ", delete);
+            system("cls");
+            printf("-----------------------------------------------------------------\n");
+            printf("\t\t\t4. DELETE LIST\n");
+            printf("-----------------------------------------------------------------\n");
             view();
         }
         else
-            printf("\n%d is not in the list\n", delete);
+            printf("\n%d is not in the list\n", num);
 
         printf("\nDo you want to add another list? (Y/N): ");
         scanf(" %c", &another);
@@ -105,33 +107,47 @@ void delete(){
             scanf(" %c", &another);
         }
     }
+    if (head == NULL)
+        created = 0;    // set to 0 since there is no list.
     system("cls");
 }
 //----- END OF THE DELETION FUNCTION ----//
 
 //---------- ADD FUNCTION ----------//
 void add(){
-    printf("\t\t2. ADD LIST\n");
     another = 'Y';
-    while (another == 'Y' || another == 'y'){
-        view();
-        createdList++;
-        curr = (struct list *)malloc(sizeof(struct list));
 
-        printf("%d. [ ] ", createdList);
+    while (another == 'Y' || another == 'y'){
+        system("cls");
+        printf("-----------------------------------------------------------------\n");
+        printf("\t\t\t3. ADD LIST\n");
+        printf("-----------------------------------------------------------------\n");
+        view();
+        numList++;
+
+        curr = (struct list *)malloc(sizeof(struct list));
+        printf("%d. ", numList);
         scanf("\n");
         gets(curr->task);
 
-        if (curr->task[0] != '!'){
-            tail->next = curr;
-            curr->next = NULL;
-            tail = curr;
+        // Validation of the input
+        while (strlen(curr->task) > 100){
+            printf("\nWARNING: You reached the limit of characters. Max: 100 characters only!\n");
+            printf("%d. ", numList+1);
+            scanf("\n");
+            gets(curr->task);
         }
+
+        // Linked
+        tail->next = curr;
+        curr->next = NULL;
+        tail = curr;
+        // End of the Linked
 
         printf("\nDo you want to add another list? (Y/N): ");
         scanf(" %c", &another);
 
-        // Validation of the input 
+        // Validation of the input
         while ((another != 'Y' && another != 'y') && (another != 'N' && another != 'n')){
             printf("WARNING: INVALID CHOICE!\n\n");
             printf("Do you want to add another list? (Y/N): ");
@@ -144,20 +160,31 @@ void add(){
 
 //---------- CREATING FUNCTION ----------//
 void createList(){
-    system("cls");
-    printf("\t\t1. Create a list\n");
+    printf("-----------------------------------------------------------------\n");
+    printf("\t\t\t1. CREATE A LIST\n");
+    printf("-----------------------------------------------------------------\n");
 
     head=curr=tail=NULL;
 
     curr = (struct list *)malloc(sizeof(struct list));
+    numList = 0;
 
-    printf("NOTE: Enter '!' to stop creating a list\n\n");
-    printf("%d. [ ] ", createdList+1);
+    printf("NOTE: Maximum of 100 characters only! Enter '!' to stop creating a list\n\n");
+    printf("%d. ", numList+1);
     scanf("\n");
     gets(curr->task);
+
+    // Validation of the input
+    while (strlen(curr->task) > 100){
+        printf("\nWARNING: You reached the limit of characters. Max: 100 characters only!\n");
+        printf("%d. ", numList+1);
+        scanf("\n");
+        gets(curr->task);
+    }
     
     while (curr->task[0] != '!'){
-        createdList++;
+        numList++;
+        created = 1;
         if (head == NULL){
             head = curr;
             head->next = NULL;
@@ -170,20 +197,30 @@ void createList(){
         }
 
         curr = (struct list *)malloc(sizeof(struct list));
-
-        printf("%d. [ ] ", createdList+1);
+        printf("%d. ", numList+1);
         scanf("\n");
         gets(curr->task);
+
+        // Validation of the input
+        while (strlen(curr->task) > 100){
+            printf("\nWARNING: You reached the limit of characters. Max: 100 characters only!\n");
+            printf("%d. ", numList+1);
+            scanf("\n");
+            gets(curr->task);
+        }
     }
 
-
-    printf("\nTO-DO LIST\n");
+    system("cls");
+    printf("-----------------------------------------------------------------\n");
+    printf("\t\t\t1. CREATE A LIST\n");
+    printf("-----------------------------------------------------------------\n");
+    printf("TO-DO LIST\n");
     if (head != NULL){
         curr = head;
-        createdList = 0;
+        numList = 0;
         while (curr != NULL){
-            createdList++;
-            printf("%d. [ ] %s\n", createdList, curr->task);
+            numList++;
+            printf("%d. %s\n", numList, curr->task);
             curr = curr->next;
         }
     }
@@ -197,41 +234,55 @@ void createList(){
 
 
 int main(){
-    while (!createdList){
+    while (!created){
         printf("1. Create a list\n");
         printf("2. Exit\n");
         printf("Enter choice: ");
         scanf("%d", &choice);
+        system("cls");
+        while (choice != 1 && choice != 2){
+            system("cls");
+            printf("WARNING: INVALID CHOICE!\n");
+            printf("1. Create a list\n");
+            printf("2. Exit\n");
+            printf("Enter choice: ");
+            scanf("%d", &choice);
+        }
         if (choice == 1)
             createList();
-        else if (choice == 2){
-            printf("Thank You for Using Our Program!\n");
+        else {
+            system("cls");
+            printf("-----------------------------------------------------------------\n");
+            printf("\t\tThank You for Using Our Program!\n");
+            printf("-----------------------------------------------------------------\n");
             return 0;
         }
-        else
-            printf("WARNING: INVALID CHOICE!\n\n");
-    }
 
-    while (choice != 5){
-        printf("\t\tTO-DO LIST PROGRAM\n");
-        printf("1. View List\n");
-        printf("2. Add List\n");
-        printf("3. Delete List\n");
-        printf("4. Checking the list as Done\n");
-        printf("5. Exit\n");
-        printf("Enter choice: ");
-        scanf("%d", &choice);
-        system("cls");
+        while (created && choice != 5){
+            printf("-----------------------------------------------------------------\n");
+            printf("\t\t\tTO-DO LIST PROGRAM\n");
+            printf("-----------------------------------------------------------------\n");
+            printf("1. Create a list\n");
+            printf("2. View List\n");
+            printf("3. Add List\n");
+            printf("4. Delete List\n");
+            printf("5. Exit\n");
+            printf("Enter choice: ");
+            scanf("%d", &choice);
+            system("cls");
 
-        switch (choice){
-            case 1 : view(); break;
-            case 2 : add(); break;
-            case 3 : delete(); break;
-            case 4 : check(); break;
-            case 5 : printf("Thank You for Using Our Program!"); return 0;
-            default : break;
+            switch (choice){
+                case 1 : createList(); break;
+                case 2 : view(); break;
+                case 3 : add(); break;
+                case 4 : delete(); break;
+                case 5 : printf("-----------------------------------------------------------------\n");
+                        printf("\t\tThank You for Using Our Program!\n");
+                        printf("-----------------------------------------------------------------\n");
+                        return 0;
+                default : break;
+            }
         }
     }
-
     return 0;
 }
